@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
-@author: Łukasz Szafron
+@author: Lukasz M. Szafron
 @email: lukszafron@gmail.com
 """
 appname = "CTX-Explorer"
