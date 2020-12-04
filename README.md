@@ -1,6 +1,8 @@
 # CTX-explorer
 
-Welcome to the CTX-Explorer app. This Python 3 program was developed for identification of inter- and intrachromosomal translocations.
+Welcome to the CTX-Explorer app. 
+
+This open-source Python 3 program was developed for identification of inter- and intrachromosomal translocations.
 
 Additional Python libraries that need to be installed for this app to work correcly:
 subprocess, re, os, gzip, sys, getopt, statistics, itertools, termcolor
