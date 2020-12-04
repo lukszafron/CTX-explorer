@@ -342,7 +342,7 @@ def supporting_reads(lst,ctx):
                     if int(value.split("\t")[2])+shift == int(ctx):
                         counter += 1
             else:
-                raise Exception(' '.join (["Bitwise flags evaluation failed. The following flag is missing:", value.split("\t")[0]]))
+                raise Exception(''.join (["Bitwise flags evaluation failed. The following flag is missing: ", value.split("\t")[0],".\n Please, check if all the reads are paired."]))
         else: # ctx on the same chromosome
             if int(value.split("\t")[0]) in forward_flags and (int(value.split("\t")[5]) >= int(tlen) or int(value.split("\t")[5]) <= -int(tlen)): # forward bitwise flags
                 if not re.search(pattern="^\d+(S|H).*$",string=value.split("\t")[4]):
@@ -361,7 +361,7 @@ def supporting_reads(lst,ctx):
                     if int(value.split("\t")[2])+shift == int(ctx):
                         counter += 1
             elif int(value.split("\t")[0]) not in forward_flags and int(value.split("\t")[0]) not in reverse_flags:
-                raise Exception(' '.join (["Bitwise flags evaluation failed. The following flag is missing:", value.split("\t")[0]]))
+                raise Exception(''.join (["Bitwise flags evaluation failed. The following flag is missing: ", value.split("\t")[0], ".\n Please, check if all the reads are paired."]))
     return counter
 
 for i1,v1 in enumerate(final_hits):
@@ -426,7 +426,7 @@ for i1,v1 in enumerate(final_hits): # discover hit pairs
                             elif int(value2[0]) in reverse_flags: # reverse bitwise flags
                                 pnext = int(value2[2])
                             else:
-                                raise Exception(' '.join (["Bitwise flags evaluation failed. The following flag is missing:", value2[0]]))
+                                raise Exception(''.join (["Bitwise flags evaluation failed. The following flag is missing: ", value2[0], ".\n Please, check if all the reads are paired."]))
                             pnext_list.append(pnext)
                 elif int(value1[2]) in secondary_alignments:
                     pnext_list.append(int(value1[8]))
