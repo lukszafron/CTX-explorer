@@ -32,11 +32,11 @@ def usage():
         "\t-g, --gzipped:\t\tindicates whether the final report file should be gzipped (default: 'no').\n"
         )
 # The next two lines are for debugging purposes only and should be commented in the final program.
-option_list = ["-b", "/workspace/lukasz/NGS-all-in-one/RUNS/BGRYG/MAPPINGS_TRIMMED/Homo_sapiens.GRCh38.p12.genome/STAR/BGRYG-93.sorted.bam", "-t","6","-T","/tmpdir/lukasz","--prefix","outfile3","-1","chr8", "-2", "chr14"]
-opts, args = getopt.getopt(option_list, "ht:T:q:b:I1:2:l:i:n:N:s:dp:g", ["help","threads=","tmpdir=","qual=","bamfile=","intractx","chrom1=","chrom2=","tlen=","insert=","nohits=","nohits_sec=","min_size=","no_filter","prefix=","gzipped"])
+#option_list = ["-b", "/workspace/lukasz/NGS-all-in-one/RUNS/BGRYG/MAPPINGS_TRIMMED/Homo_sapiens.GRCh38.p12.genome/STAR/BGRYG-93.sorted.bam", "-t","6","-T","/tmpdir/lukasz","--prefix","outfile3","-1","chr8", "-2", "chr14"]
+#opts, args = getopt.getopt(option_list, "ht:T:q:b:I1:2:l:i:n:N:s:dp:g", ["help","threads=","tmpdir=","qual=","bamfile=","intractx","chrom1=","chrom2=","tlen=","insert=","nohits=","nohits_sec=","min_size=","no_filter","prefix=","gzipped"])
 
 try:
- #       opts, args = getopt.getopt(sys.argv[1:], "ht:T:q:b:I1:2:l:i:n:N:s:dp:g", ["help","threads=","tmpdir=","qual=","bamfile=","intractx","chrom1=","chrom2=","tlen=","insert=","nohits=","nohits_sec=","min_size=","no_filter","prefix=","gzipped"])
+        opts, args = getopt.getopt(sys.argv[1:], "ht:T:q:b:I1:2:l:i:n:N:s:dp:g", ["help","threads=","tmpdir=","qual=","bamfile=","intractx","chrom1=","chrom2=","tlen=","insert=","nohits=","nohits_sec=","min_size=","no_filter","prefix=","gzipped"])
         if len(opts) == 0:
                 usage()
                 sys.exit()
