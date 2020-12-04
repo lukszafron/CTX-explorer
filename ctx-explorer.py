@@ -235,7 +235,10 @@ def loc_sort(value):
     return int(value.split(sep="\t")[13]) # sort by ctx
 for chrom in filtered_lines:
     chrom[1].sort(key=loc_sort)
-del(chrom)
+try:
+    del(chrom)
+except:
+    print("The chrom variable is missing,")
 
 print("Calculating the number of hits for each translocation...")
 
