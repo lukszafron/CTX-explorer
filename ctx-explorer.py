@@ -6,7 +6,7 @@
 """
 appname = "CTX-Explorer"
 
-import subprocess, re, os, gzip, sys, getopt, statistics, warnings
+import subprocess, re, os, gzip, sys, getopt, statistics
 from itertools import groupby, chain
 from termcolor import colored
 
@@ -238,7 +238,7 @@ for chrom in filtered_lines:
 try:
     del(chrom)
 except:
-    warnings.warn("The initial filtering step returned no reads.")
+    print(colored("The initial filtering step returned no reads.", "red"))
 
 print("Calculating the number of hits for each translocation...")
 
