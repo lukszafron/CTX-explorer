@@ -502,7 +502,7 @@ def count_hit_pairs(lst):
             if v1.split("\t")[0] == v2.split("\t")[1] and v1.split("\t")[1] == v2.split("\t")[0]:
                 counter += 1
                 lst[i1] = "\t".join([lst[i1], "TRUE"])
-                break
+                #break
     
     return int(counter/2)
 no_final_hit_pairs = count_hit_pairs(final_hits)
