@@ -527,7 +527,8 @@ try:
     print("Finding all hits for the specified pair of chromosomes...")
     final_hits_chr = [value for value in final_hits if (value.split("\t")[4] == chr1 and value.split("\t")[8] == chr2) or (value.split("\t")[4] == chr2 and value.split("\t")[8] == chr1)] # keep only mappings for the selected pair of chromosomes
     no_final_hit_groups_chr = len(set([hit.split("\t")[0] for hit in final_hits_chr]))
-    no_final_hit_pairs_chr = count_hit_pairs(final_hits_chr)
+    final_hits_chr_true = [value for value in final_hits_chr if value.split("\t")[20] == "TRUE"]
+    no_final_hit_pairs_chr = len(set([hit.split("\t")[0] for hit in final_hits_chr_true]))/2
 except:
     None
 
