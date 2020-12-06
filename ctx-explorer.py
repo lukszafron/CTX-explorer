@@ -32,7 +32,7 @@ def usage():
         "\t-g, --gzipped:\t\tindicates whether the final report file should be gzipped (default: 'no').\n"
         )
 # The next two lines are for debugging purposes only and should be commented in the final program.
-#option_list = ["-b", "/workspace/lukasz/NGS-all-in-one/RUNS/BGRYG/MAPPINGS_TRIMMED/Homo_sapiens.GRCh38.p12.genome/STAR/BGRYG-93.sorted.bam", "-t","6","-T","/tmpdir/lukasz","--prefix","outfile3","-1","chr8", "-2", "chr14"]
+#option_list = ["-b", "/workspace/lukasz/NGS-all-in-one/RUNS/BGRYG/MAPPINGS/GRCh38.chr.only.genome/HISAT2/BGRYG-93.sorted.no_duplicates.bam", "-t","6","-T","/tmpdir/lukasz","--prefix","outfile3","-1","chr8", "-2", "chr14"]
 #opts, args = getopt.getopt(option_list, "ht:T:q:b:I1:2:l:i:n:N:s:dp:g", ["help","threads=","tmpdir=","qual=","bamfile=","intractx","chrom1=","chrom2=","tlen=","insert=","nohits=","nohits_sec=","min_size=","no_filter","prefix=","gzipped"])
 
 try:
@@ -501,7 +501,13 @@ def count_hit_pairs(lst):
         for v2 in hit_index:
             if v1.split("\t")[0] == v2.split("\t")[1] and v1.split("\t")[1] == v2.split("\t")[0]:
                 counter += 1
+                for i3,v3 in enumerate(lst):
+                    if re.search(string=v3.split("\t")[0], pattern="".join(["^", v1.split("\t")[0], "$"])):
+                        lst[i3] = "\t".join([lst[i3], "TRUE"])
                 break
+    for i1,v1 in enumerate(lst):
+        if(len(v1.split("\t")) == 20):
+            lst[i1] = "\t".join([lst[i1], "FALSE"])
     
     return int(counter/2)
 no_final_hit_pairs = count_hit_pairs(final_hits)
@@ -515,17 +521,24 @@ for i1,v1 in enumerate(final_hits):
         final_hits[i1] = '\t'.join(v1)
     else:
         raise Exception("CIGAR string evaluation failed.")
+        
+for index,value in enumerate(final_hits): # reorder each hit by placing hit pairs column next to the paired hits column.
+    l = value.split("\t")
+    l.insert(2,l[-1])
+    l.pop()
+    final_hits[index] = "\t".join(l)
 
 try:
     chr1, chr2
     print("Finding all hits for the specified pair of chromosomes...")
-    final_hits_chr = [value for value in final_hits if (value.split("\t")[4] == chr1 and value.split("\t")[8] == chr2) or (value.split("\t")[4] == chr2 and value.split("\t")[8] == chr1)] # keep only mappings for the selected pair of chromosomes
+    final_hits_chr = [value for value in final_hits if (value.split("\t")[5] == chr1 and value.split("\t")[9] == chr2) or (value.split("\t")[5] == chr2 and value.split("\t")[9] == chr1)] # keep only mappings for the selected pair of chromosomes
     no_final_hit_groups_chr = len(set([hit.split("\t")[0] for hit in final_hits_chr]))
-    no_final_hit_pairs_chr = count_hit_pairs(final_hits_chr)
+    final_hits_chr_true = [value for value in final_hits_chr if value.split("\t")[2] == "TRUE"]
+    no_final_hit_pairs_chr = len(set([hit.split("\t")[0] for hit in final_hits_chr_true]))/2
 except:
     None
 
-header = "HIT_NO\tPAIRED_HITS\tQNAME\tFLAG\tRNAME\tPOS\tMAPQ\tCIGAR\tRNEXT\tPNEXT\tTLEN\tSEQ\tSEQ_MATCHING\tSEQ_OVERHANG\tOVERHANG_LENGTH\tCTX_POS\tNO_HITS\tNO_HITS_PER_SEC_CHR\tNO_SUPP_READS\tHIT_GROUP_SIZE"
+header = "HIT_NO\tPAIRED_HITS\tHIT_PAIRS\tQNAME\tFLAG\tRNAME\tPOS\tMAPQ\tCIGAR\tRNEXT\tPNEXT\tTLEN\tSEQ\tSEQ_MATCHING\tSEQ_OVERHANG\tOVERHANG_LENGTH\tCTX_POS\tNO_HITS\tNO_HITS_PER_SEC_CHR\tNO_SUPP_READS\tHIT_GROUP_SIZE"
 
 if compressed_output:
     suffix = "_"+appname+"_results.tsv.gz"
