@@ -497,12 +497,14 @@ def count_hit_pairs(lst):
     hit_index = list(set(["\t".join([v1[0],v2]) for v1 in hit_index for v2 in v1[1]]))
     
     counter = 0
-    for i1,v1 in enumerate(hit_index):
+    for v1 in hit_index:
         for v2 in hit_index:
             if v1.split("\t")[0] == v2.split("\t")[1] and v1.split("\t")[1] == v2.split("\t")[0]:
                 counter += 1
-                lst[i1] = "\t".join([lst[i1], "TRUE"])
-                #break
+                for i3,v3 in enumerate(lst):
+                    if re.search(string=v3.split("\t")[0], pattern="".join(["^", v1.split("\t")[0], "$"])):
+                        lst[i3] = "\t".join([lst[i3], "TRUE"])
+                break
     
     return int(counter/2)
 no_final_hit_pairs = count_hit_pairs(final_hits)
