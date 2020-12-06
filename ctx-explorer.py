@@ -505,6 +505,9 @@ def count_hit_pairs(lst):
                     if re.search(string=v3.split("\t")[0], pattern="".join(["^", v1.split("\t")[0], "$"])):
                         lst[i3] = "\t".join([lst[i3], "TRUE"])
                 break
+    for i1,v1 in enumerate(lst):
+        if(len(v1.split("\t")) == 20):
+            lst[i1] = "\t".join([lst[i1], "FALSE"])
     
     return int(counter/2)
 no_final_hit_pairs = count_hit_pairs(final_hits)
