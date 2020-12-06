@@ -497,10 +497,11 @@ def count_hit_pairs(lst):
     hit_index = list(set(["\t".join([v1[0],v2]) for v1 in hit_index for v2 in v1[1]]))
     
     counter = 0
-    for v1 in hit_index:
+    for i1,v1 in enumerate(hit_index):
         for v2 in hit_index:
             if v1.split("\t")[0] == v2.split("\t")[1] and v1.split("\t")[1] == v2.split("\t")[0]:
                 counter += 1
+                lst[i1] = "\t".join([lst[i1], "TRUE"])
                 break
     
     return int(counter/2)
@@ -525,7 +526,7 @@ try:
 except:
     None
 
-header = "HIT_NO\tPAIRED_HITS\tQNAME\tFLAG\tRNAME\tPOS\tMAPQ\tCIGAR\tRNEXT\tPNEXT\tTLEN\tSEQ\tSEQ_MATCHING\tSEQ_OVERHANG\tOVERHANG_LENGTH\tCTX_POS\tNO_HITS\tNO_HITS_PER_SEC_CHR\tNO_SUPP_READS\tHIT_GROUP_SIZE"
+header = "HIT_NO\tPAIRED_HITS\tQNAME\tFLAG\tRNAME\tPOS\tMAPQ\tCIGAR\tRNEXT\tPNEXT\tTLEN\tSEQ\tSEQ_MATCHING\tSEQ_OVERHANG\tOVERHANG_LENGTH\tCTX_POS\tNO_HITS\tNO_HITS_PER_SEC_CHR\tNO_SUPP_READS\tHIT_GROUP_SIZE\tPAIRED_HIT"
 
 if compressed_output:
     suffix = "_"+appname+"_results.tsv.gz"
