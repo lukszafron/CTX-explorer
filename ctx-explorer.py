@@ -522,7 +522,7 @@ for i1,v1 in enumerate(final_hits):
     else:
         raise Exception("CIGAR string evaluation failed.")
         
-for index,value in enumerate(final_hits): # reorder each hit by placing hit pairs column next to the paired hits column.
+for index,value in enumerate(final_hits): # reorder each hit by placing the hit pair column next to the paired hits column.
     l = value.split("\t")
     l.insert(2,l[-1])
     l.pop()
