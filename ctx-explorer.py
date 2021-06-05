@@ -1,10 +1,11 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-@author: Lukasz M. Szafron
+@author: Łukasz Szafron
 @email: lukszafron@gmail.com
 """
 appname = "CTX-Explorer"
+app_version = "1.0"
 
 import subprocess, re, os, gzip, sys, getopt, statistics
 from itertools import groupby, chain
@@ -18,7 +19,7 @@ def usage():
         "\t-t, --threads:\t\tdefines the number of CPU threads that are to be used (default: 1).\n"
         "\t-T, --tmpdir:\t\tdefines the directory where temporary files are to be stored (default: current dir).\n"
         "\t-q, --qual:\t\tdefines the minimal Phred quality score of mappings to be used (default: 20).\n"
-        "\t-b, --bamfile:\t\tthe name of a bamfile to be used",colored("(MANDATORY)", "green")+".\n"
+        "\t-b, --bamfile:\t\tthe name of a BAM file to be used",colored("(MANDATORY)", "green")+".\n"
         "\t-I, --intractx:\t\tindicates if intra-chromosomal translocations should be evaluated (default: 'no').",colored("This option significantly increases memory usage.","green")+"\n"
         "\t-1, --chrom1:\t\tthe name of the first chromosome (optional) involved in a translocation (e.g., 'chr1').\n"
         "\t-2, --chrom2:\t\tthe name of the second chromosome (optional) involved in a translocation (e.g., 'chr2').\n"
@@ -30,13 +31,14 @@ def usage():
         "\t-d, --no_filter:\tspecifies whether the filtering by the number of supporting reads should be turned off (default: 'no').\n"
         "\t-p, --prefix:\t\tspecifies a prefix of a file in which the final report will be saved (default: 'output').\n"
         "\t-g, --gzipped:\t\tindicates whether the final report file should be gzipped (default: 'no').\n"
+        "\t-v, --version:\t\tprints the version of this program.\n"
         )
 # The next two lines are for debugging purposes only and should be commented in the final program.
-#option_list = ["-b", "/workspace/lukasz/NGS-all-in-one/RUNS/BGRYG/MAPPINGS/GRCh38.chr.only.genome/HISAT2/BGRYG-93.sorted.no_duplicates.bam", "-t","6","-T","/tmpdir/lukasz","--prefix","outfile3","-1","chr8", "-2", "chr14"]
+#option_list = ["-b", "/workspace/lukasz/RUNS/BGRYG/MAPPINGS/GRCh38.chr.only/HISAT2/BGRYG-95.sorted.bam", "-t","6","-T","/tmpdir/lukasz","--prefix","outfile3","-1","chr8", "-2", "chr14"]
 #opts, args = getopt.getopt(option_list, "ht:T:q:b:I1:2:l:i:n:N:s:dp:g", ["help","threads=","tmpdir=","qual=","bamfile=","intractx","chrom1=","chrom2=","tlen=","insert=","nohits=","nohits_sec=","min_size=","no_filter","prefix=","gzipped"])
 
 try:
-        opts, args = getopt.getopt(sys.argv[1:], "ht:T:q:b:I1:2:l:i:n:N:s:dp:g", ["help","threads=","tmpdir=","qual=","bamfile=","intractx","chrom1=","chrom2=","tlen=","insert=","nohits=","nohits_sec=","min_size=","no_filter","prefix=","gzipped"])
+        opts, args = getopt.getopt(sys.argv[1:], "ht:T:q:b:I1:2:l:i:n:N:s:dp:gv", ["help","threads=","tmpdir=","qual=","bamfile=","intractx","chrom1=","chrom2=","tlen=","insert=","nohits=","nohits_sec=","min_size=","no_filter","prefix=","gzipped", "version"])
         if len(opts) == 0:
                 usage()
                 sys.exit()
@@ -74,6 +76,9 @@ try:
                 prefix = a
             elif o in ("-g", "--gzipped"):
                 compressed_output = True
+            elif o in ("-v", "--version"):
+                print(appname, " version: ", app_version, sep = "")
+                sys.exit()
             else:
                 assert False, "Unhandled option: "+o
 
@@ -235,10 +240,7 @@ def loc_sort(value):
     return int(value.split(sep="\t")[13]) # sort by ctx
 for chrom in filtered_lines:
     chrom[1].sort(key=loc_sort)
-try:
-    del(chrom)
-except:
-    print(colored("The initial filtering step returned no reads.", "red"))
+del(chrom)
 
 print("Calculating the number of hits for each translocation...")
 
@@ -342,7 +344,7 @@ def supporting_reads(lst,ctx):
                     if int(value.split("\t")[2])+shift == int(ctx):
                         counter += 1
             else:
-                raise Exception(''.join (["Bitwise flags evaluation failed. The following flag is missing: ", value.split("\t")[0],". Please, check if all the reads are paired."]))
+                raise Exception("Bitwise flags evaluation failed.")
         else: # ctx on the same chromosome
             if int(value.split("\t")[0]) in forward_flags and (int(value.split("\t")[5]) >= int(tlen) or int(value.split("\t")[5]) <= -int(tlen)): # forward bitwise flags
                 if not re.search(pattern="^\d+(S|H).*$",string=value.split("\t")[4]):
@@ -361,7 +363,7 @@ def supporting_reads(lst,ctx):
                     if int(value.split("\t")[2])+shift == int(ctx):
                         counter += 1
             elif int(value.split("\t")[0]) not in forward_flags and int(value.split("\t")[0]) not in reverse_flags:
-                raise Exception(''.join (["Bitwise flags evaluation failed. The following flag is missing: ", value.split("\t")[0], ". Please, check if all the reads are paired."]))
+                raise Exception("Bitwise flags evaluation failed.")
     return counter
 
 for i1,v1 in enumerate(final_hits):
@@ -426,7 +428,7 @@ for i1,v1 in enumerate(final_hits): # discover hit pairs
                             elif int(value2[0]) in reverse_flags: # reverse bitwise flags
                                 pnext = int(value2[2])
                             else:
-                                raise Exception(''.join (["Bitwise flags evaluation failed. The following flag is missing: ", value2[0], ". Please, check if all the reads are paired."]))
+                                raise Exception("Bitwise flags evaluation failed.")
                             pnext_list.append(pnext)
                 elif int(value1[2]) in secondary_alignments:
                     pnext_list.append(int(value1[8]))
@@ -479,36 +481,30 @@ for index,value in enumerate(final_hits): # reorder each hit by placing paired h
 def count_hit_pairs(lst):
     hit_index = ["\t".join(hit.split("\t")[0:2]) for hit in lst if hit.split("\t")[1] != "NA"]
     hit_index = [[name,list(group)] for name,group in groupby(hit_index,key=lambda x:x.split("\t")[0])]
-    
+
     for i1,v1 in enumerate(hit_index):
         for value in v1[1]:
             value = value.split("\t")
             value.pop(0)
             hit_index[i1][1] = value
-    
+
     for i1,v1 in enumerate(hit_index):
         for value in v1[1]:
             hit_index[i1][1] = re.findall(pattern="\d+\:[^a]", string=value)
-    
+
     for i1,v1 in enumerate(hit_index):
         for i2,v2 in enumerate(v1[1]):
             hit_index[i1][1][i2] = v2.split(":")[0]
-    
+
     hit_index = list(set(["\t".join([v1[0],v2]) for v1 in hit_index for v2 in v1[1]]))
-    
+
     counter = 0
     for v1 in hit_index:
         for v2 in hit_index:
             if v1.split("\t")[0] == v2.split("\t")[1] and v1.split("\t")[1] == v2.split("\t")[0]:
                 counter += 1
-                for i3,v3 in enumerate(lst):
-                    if re.search(string=v3.split("\t")[0], pattern="".join(["^", v1.split("\t")[0], "$"])):
-                        lst[i3] = "\t".join([lst[i3], "TRUE"])
                 break
-    for i1,v1 in enumerate(lst):
-        if(len(v1.split("\t")) == 20):
-            lst[i1] = "\t".join([lst[i1], "FALSE"])
-    
+
     return int(counter/2)
 no_final_hit_pairs = count_hit_pairs(final_hits)
 
@@ -521,24 +517,17 @@ for i1,v1 in enumerate(final_hits):
         final_hits[i1] = '\t'.join(v1)
     else:
         raise Exception("CIGAR string evaluation failed.")
-        
-for index,value in enumerate(final_hits): # reorder each hit by placing the hit pair column next to the paired hits column.
-    l = value.split("\t")
-    l.insert(2,l[-1])
-    l.pop()
-    final_hits[index] = "\t".join(l)
 
 try:
     chr1, chr2
     print("Finding all hits for the specified pair of chromosomes...")
-    final_hits_chr = [value for value in final_hits if (value.split("\t")[5] == chr1 and value.split("\t")[9] == chr2) or (value.split("\t")[5] == chr2 and value.split("\t")[9] == chr1)] # keep only mappings for the selected pair of chromosomes
+    final_hits_chr = [value for value in final_hits if (value.split("\t")[4] == chr1 and value.split("\t")[8] == chr2) or (value.split("\t")[4] == chr2 and value.split("\t")[8] == chr1)] # keep only mappings for the selected pair of chromosomes
     no_final_hit_groups_chr = len(set([hit.split("\t")[0] for hit in final_hits_chr]))
-    final_hits_chr_true = [value for value in final_hits_chr if value.split("\t")[2] == "TRUE"]
-    no_final_hit_pairs_chr = len(set([hit.split("\t")[0] for hit in final_hits_chr_true]))/2
+    no_final_hit_pairs_chr = count_hit_pairs(final_hits_chr)
 except:
     None
 
-header = "HIT_NO\tPAIRED_HITS\tHIT_PAIR\tQNAME\tFLAG\tRNAME\tPOS\tMAPQ\tCIGAR\tRNEXT\tPNEXT\tTLEN\tSEQ\tSEQ_MATCHING\tSEQ_OVERHANG\tOVERHANG_LENGTH\tCTX_POS\tNO_HITS\tNO_HITS_PER_SEC_CHR\tNO_SUPP_READS\tHIT_GROUP_SIZE"
+header = "HIT_NO\tPAIRED_HITS\tQNAME\tFLAG\tRNAME\tPOS\tMAPQ\tCIGAR\tRNEXT\tPNEXT\tTLEN\tSEQ\tSEQ_MATCHING\tSEQ_OVERHANG\tOVERHANG_LENGTH\tCTX_POS\tNO_HITS\tNO_HITS_PER_SEC_CHR\tNO_SUPP_READS\tHIT_GROUP_SIZE"
 
 if compressed_output:
     suffix = "_"+appname+"_results.tsv.gz"
