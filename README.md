@@ -1,4 +1,4 @@
-# CTX-explorer
+# $${lightgreenCTX-explorer}$$
 
 Welcome to the CTX-Explorer app. 
 
