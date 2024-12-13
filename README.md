@@ -1,4 +1,4 @@
-# $${\color{lightgreen}CTX-explorer}$$
+# $${\color{green}CTX-explorer}$$
 
 Welcome to the CTX-Explorer app. 
 
